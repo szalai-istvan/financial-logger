@@ -1,0 +1,30 @@
+{
+  "type": "module",
+  "name": "financial-logger-backend",
+  "version": "1.0.0",
+  "description": "A tool for tracking personal finances",
+  "main": "dist/index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./dist/index.js",
+    "compile": "npx tsc",
+    "jumpstart": "npm run compile && npm run start",
+    "buildContainerImage": "docker build --tag financial-logger:1.0.0 .",
+    "startContainer": "docker run -d -p 3000:3000 --name financial-logger financial-logger:1.0.0",
+    "stopContainer": "docker stop financial-logger && docker remove financial-logger",
+    "boot": "npm run buildContainerImage && npm run startContainer",
+    "reboot": "npm run stopContainer && npm run boot"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.9.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0"
+  }
+}
