@@ -1,16 +1,22 @@
-import type { Request, Response } from "express";
+import type { Request } from "express";
+import type { MonthlyData } from "../types/MonthlyData.js";
+import type { Error } from "../types/Error.js";
+import { ErrorCode } from "../types/ErrorCode.js";
 
-export function getMonthlyData(req: Request, res: Response) {
+export function getMonthlyData(req: Request): MonthlyData {
     const year = Number(req.params.year);
     const month = Number(req.params.month);
 
     if (!month || !year) {
-        res
-        .status(400)
-        .json({error: `missing or invalid parameter, year=${year}, month=${month}`});
+        const error: Error = {
+            errorCode: ErrorCode.MISSING_PARAMETER,
+            message: `Missing parameter: year=${year}, month=${month}`,
+            status: 400
+        };
+        throw error;
     }
 
-    res.status(200).json({
+    return {
         year: year,
         month: month,
         expenses: [{
@@ -49,5 +55,5 @@ export function getMonthlyData(req: Request, res: Response) {
                 amount: 250000
             }
         ]
-    });
+    };
 }

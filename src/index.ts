@@ -1,21 +1,24 @@
 import express from "express";
-import dotenv from "dotenv";
-import path from "path";
 
 import { getMonthlyData } from "./rest/monthlyRest.js";
 import { currentMonthlyView, monthlyView } from "./view/monthlyView.js";
 import { downloadScript } from "./view/downloadScript.js";
+import { loadEnvironment } from "./config/envLoader.js";
+import { createRequestWrapper } from "./rest/wrapRequest/wrapRequest.js";
 
-const envFile = '.env.dev';
-dotenv.config({ path: path.resolve(process.cwd(), envFile) });
+loadEnvironment();
 
 const app = express();
 app.use(express.json());
 
+// REST
+app.get('/rest/monthly/:year/:month', createRequestWrapper(getMonthlyData));
+
+// views
 app.get('/scripts/:subdirectory/:filename', downloadScript);
-app.get('/monthly/view/:year/:month', monthlyView);
-app.get('/monthly/:year/:month', getMonthlyData);
+app.get('/view/monthly/:year/:month', monthlyView);
 app.get('/', currentMonthlyView);
+
 
 const port = process.env.PORT;
 if (!port) {

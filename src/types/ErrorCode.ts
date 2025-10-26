@@ -1,0 +1,4 @@
+export enum ErrorCode {
+    REQUEST_IS_NULL_OR_UNDEFINED,
+    MISSING_PARAMETER
+}

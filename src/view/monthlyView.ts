@@ -19,5 +19,5 @@ export function currentMonthlyView(req: Request, res: Response) {
     const year = currentDate.getUTCFullYear();
     const month = currentDate.getUTCMonth();
 
-    res.redirect(301, `/monthly/view/${year}/${month}`);
+    res.redirect(301, `/view/monthly/${year}/${month}`);
 }
