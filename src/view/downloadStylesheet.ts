@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import path from "path";
 
-export function downloadScript(req: Request, res: Response) {
+export function downloadStylesheet(req: Request, res: Response) {
     const subdirectory = req.params.subdirectory || '';
     const filename = req.params.filename || '';
 
@@ -11,5 +11,5 @@ export function downloadScript(req: Request, res: Response) {
             .json({error: `missing or invalid parameter, subdirectory=${subdirectory}, filename=${filename}`});
         }
    
-        res.sendFile(path.resolve(process.cwd(), 'templates', subdirectory, 'js', filename));
+        res.sendFile(path.resolve(process.cwd(), 'templates', subdirectory, 'css', filename));
 }

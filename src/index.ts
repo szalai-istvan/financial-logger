@@ -5,6 +5,7 @@ import { currentMonthlyView, monthlyView } from "./view/monthlyView.js";
 import { downloadScript } from "./view/downloadScript.js";
 import { loadEnvironment } from "./config/envLoader.js";
 import { createRequestWrapper } from "./rest/wrapRequest/wrapRequest.js";
+import { downloadStylesheet } from "./view/downloadStylesheet.js";
 
 loadEnvironment();
 
@@ -15,7 +16,8 @@ app.use(express.json());
 app.get('/rest/monthly/:year/:month', createRequestWrapper(getMonthlyData));
 
 // views
-app.get('/scripts/:subdirectory/:filename', downloadScript);
+app.get('/script/:subdirectory/:filename', downloadScript);
+app.get('/styles/:subdirectory/:filename', downloadStylesheet);
 app.get('/view/monthly/:year/:month', monthlyView);
 app.get('/', currentMonthlyView);
 
