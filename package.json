@@ -13,7 +13,9 @@
     "startContainer": "docker run -d -p 3000:3000 --name financial-logger financial-logger:1.0.0",
     "stopContainer": "docker stop financial-logger && docker remove financial-logger",
     "boot": "npm run buildContainerImage && npm run startContainer",
-    "reboot": "npm run stopContainer && npm run boot"
+    "reboot": "npm run stopContainer && npm run boot",
+    "compose-up": "docker-compose -p financial-logger up -d --force-recreate",
+    "compose-down": "docker-compose down"
   },
   "author": "",
   "license": "ISC",

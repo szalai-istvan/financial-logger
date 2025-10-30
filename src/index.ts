@@ -15,6 +15,7 @@ app.use(express.json());
 
 // REST
 app.get('/rest/monthly/:year/:month', createRequestWrapper(getMonthlyData));
+
 app.post('/rest/cost', createRequestWrapper(createNewCost));
 
 // create new cost

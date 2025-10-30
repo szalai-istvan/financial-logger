@@ -1,2 +1,14 @@
 - Havi lekérdezés:
     - Kategóriák összegyüjtése
+
+costs
+    |-> username
+        |-> year.month
+
+fixedCosts
+    |-> username
+        |-> year.month
+
+incomes
+    |-> username
+        |-> year.month

@@ -6,3 +6,7 @@ export interface CreateCostRequestBody {
     category: string,
     comment: string | undefined
 }
+
+export interface CreateCostResponseBody {
+    id: string
+}
