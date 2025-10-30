@@ -4,26 +4,53 @@
     <meta charset="UTF-8"/>
     <title>Havi nézet ${year}. ${monthName}</title>
     <link rel="stylesheet" href=""/>
-</head>
+    ${templateConstants}
+    </head>
 <body>
-    <div id="leftColumnDiv" style="width: 50%; background-color: red;">
+    <div id="leftColumnDiv" style="width: 50%; background-color: red; display: block; float: left;">
+        <div id="costTableDiv">
+            <table>
+                <thead>
+                <tr>
+                    <th colspan="2">Nap</th>
+                    <th>Összeg</th>
+                    <th>Kategória</th>
+                    <th>Megjegyzés</th>
+                </tr>
+                </thead>
+                <tbody id="costTableTbody">
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="rightColumnDiv" style="width: 50%; background-color: green; display: block; float: left;">
+        <div id="goalTableDiv">
+
+        </div>
         <div id="incomeTableDiv">
             <table>
-                <th>
-                    <td>Megnevezés</td>
-                    <td>Összeg</td>
-                </th>
+
             </table>
         </div>
         <div id="fixCostTableDiv">
+            <table>
+
+            </table>
+        </div>
+        <div id="briefSummaryTableDiv">
 
         </div>
-        <div id="costTableDiv">
+        <div id="monthlySpendingsByCategoryTableDiv">
 
         </div>
     </div>
-    <div id="rightColumnDiv" style="width: 50%; background-color: green;">
 
-    </div>
+    <script type="text/javascript" src="/script/monthly/monthlyData.js"></script>
+
+    <script type="text/javascript" src="/script/common/tables.js"></script>
+    <script type="text/javascript" src="/script/common/restClient.js"></script>
+
 </body>
 </html>

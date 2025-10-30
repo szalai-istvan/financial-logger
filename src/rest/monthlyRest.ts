@@ -19,7 +19,7 @@ export function getMonthlyData(req: Request): MonthlyData {
     return {
         year: year,
         month: month,
-        expenses: [{
+        costs: [{
             day: 1,
             amount: 1500,
             category: 'other',

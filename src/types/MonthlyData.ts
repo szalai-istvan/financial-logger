@@ -1,13 +1,13 @@
 export interface MonthlyData {
     year: number,
     month: number,
-    expenses: Expense[],
+    costs: Cost[],
     incomes: Income[],
     fixCosts: FixCost[],
     goal: MonthlyGoal
 }
 
-export interface Expense {
+export interface Cost {
     day: number,
     amount: number,
     category: string,
