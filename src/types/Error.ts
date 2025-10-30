@@ -1,6 +1,6 @@
 import type { ErrorCode } from "./ErrorCode.js";
 
-export interface Error {
+export interface ErrorMessage {
     status: number,
     errorCode: ErrorCode,
     message: string

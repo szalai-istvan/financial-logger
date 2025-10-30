@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { ErrorCode } from "../../types/ErrorCode.js";
-import type { Error } from "../../types/Error.js";
+import type { ErrorMessage } from "../../types/Error.js";
 
 export function wrapRequest(req: Request, res: Response, handler: Function): void {
     if (!req) {
@@ -16,7 +16,7 @@ export function wrapRequest(req: Request, res: Response, handler: Function): voi
         const result = handler(req);
         res.status(200).json(result);
     } catch(e) {
-        const error = (e as Error);
+        const error = (e as ErrorMessage);
         createErrorResponse(res, error);
     }
 }
@@ -25,7 +25,7 @@ export function createRequestWrapper(handler: Function): any {
     return (req: Request, res: Response) => wrapRequest(req, res, handler);
 }
 
-function createErrorResponse(res: Response, error: Error) {
+function createErrorResponse(res: Response, error: ErrorMessage) {
     res.status(error.status).json({
         errorCode: error.errorCode,
         message: error.message

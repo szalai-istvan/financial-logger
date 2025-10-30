@@ -32,7 +32,7 @@ export function monthlyView(req: Request, res: Response) {
 export function currentMonthlyView(req: Request, res: Response) {
     const currentDate = new Date();
     const year = currentDate.getUTCFullYear();
-    const month = currentDate.getUTCMonth();
+    const month = currentDate.getUTCMonth() + 1;
 
     res.redirect(301, `/view/monthly/${year}/${month}`);
 }

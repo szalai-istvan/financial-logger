@@ -1,14 +1,14 @@
 import type { Request } from "express";
-import type { MonthlyData } from "../types/MonthlyData.js";
-import type { Error } from "../types/Error.js";
-import { ErrorCode } from "../types/ErrorCode.js";
+import type { MonthlyData } from "../../types/MonthlyData.js";
+import type { ErrorMessage } from "../../types/Error.js";
+import { ErrorCode } from "../../types/ErrorCode.js";
 
 export function getMonthlyData(req: Request): MonthlyData {
     const year = Number(req.params.year);
     const month = Number(req.params.month);
 
     if (!month || !year) {
-        const error: Error = {
+        const error: ErrorMessage = {
             errorCode: ErrorCode.MISSING_PARAMETER,
             message: `Missing parameter: year=${year}, month=${month}`,
             status: 400

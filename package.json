@@ -9,7 +9,6 @@
     "start": "node ./dist/index.js",
     "compile": "npx tsc",
     "jumpstart": "npm run compile && npm run start",
-
     "buildContainerImage": "docker build --tag financial-logger:1.0.0 .",
     "startContainer": "docker run -d -p 3000:3000 --name financial-logger financial-logger:1.0.0",
     "stopContainer": "docker stop financial-logger && docker remove financial-logger",
@@ -26,6 +25,7 @@
   },
   "dependencies": {
     "dotenv": "^17.2.3",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2"
   }
 }

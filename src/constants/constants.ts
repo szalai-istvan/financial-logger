@@ -1,4 +1,5 @@
 export const MONTH_NAMES = [
+    null,
     'Január',
     'Február',
     'Március',
