@@ -14,7 +14,7 @@
     "stopContainer": "docker stop financial-logger && docker remove financial-logger",
     "boot": "npm run buildContainerImage && npm run startContainer",
     "reboot": "npm run stopContainer && npm run boot",
-    "compose-up": "docker-compose -p financial-logger up -d --force-recreate",
+    "compose-up": "docker-compose -p financial-logger up -d --build --force-recreate",
     "compose-down": "docker-compose down"
   },
   "author": "",
@@ -26,8 +26,9 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "dotenv": "^17.2.3",
-    "express": "^5.1.0",
-    "jsonwebtoken": "^9.0.2"
+    "dotenv": "17.2.3",
+    "express": "5.1.0",
+    "jsonwebtoken": "9.0.2",
+    "mongodb": "6.20.0"
   }
 }

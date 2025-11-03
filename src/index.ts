@@ -4,19 +4,21 @@ import { getMonthlyData } from "./rest/monthly/monthlyRest.js";
 import { currentMonthlyView, monthlyView } from "./view/monthlyView.js";
 import { downloadScript } from "./view/downloadScript.js";
 import { loadEnvironment } from "./config/envLoader.js";
-import { createRequestWrapper } from "./rest/wrapRequest/wrapRequest.js";
+import { createAuthenticatedRequestWrapper } from "./rest/wrapRequest/wrapRequest.js";
 import { downloadStylesheet } from "./view/downloadStylesheet.js";
 import { createNewCost } from "./rest/cost/createNewCost.js";
+import { connectToMongoDb, MONGO_COLLECTION_MONTHLY_DATA } from "./mongo/connection.js";
 
 loadEnvironment();
+connectToMongoDb();
 
 const app = express();
 app.use(express.json());
 
 // REST
-app.get('/rest/monthly/:year/:month', createRequestWrapper(getMonthlyData));
+app.get('/rest/monthly/:year/:month', createAuthenticatedRequestWrapper(getMonthlyData));
 
-app.post('/rest/cost', createRequestWrapper(createNewCost));
+app.post('/rest/cost', createAuthenticatedRequestWrapper(createNewCost));
 
 // create new cost
 // update cost

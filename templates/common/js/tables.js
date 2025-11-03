@@ -4,7 +4,7 @@ function rebuildTable(objArray, keysInOrder, tbodyId) {
         throw new Error(`Invalid tbodyId=${tbodyId}`);
     }
 
-    tbody.children = [];
+    tbody.innerHTML = '';
     objArray.forEach(obj => appendRowToRable(obj, keysInOrder, tbodyId));
 }
 

@@ -1,14 +1,7 @@
 - Havi lekérdezés:
     - Kategóriák összegyüjtése
 
-costs
-    |-> username
-        |-> year.month
-
-fixedCosts
-    |-> username
-        |-> year.month
-
-incomes
-    |-> username
-        |-> year.month
+monthlyData
+    |-> username.year.month {
+        id: username.year.month
+    }

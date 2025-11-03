@@ -1,4 +1,5 @@
 export interface MonthlyData {
+    _id: string,
     year: number,
     month: number,
     costs: Cost[],

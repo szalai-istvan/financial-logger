@@ -2,8 +2,9 @@ import type { Request } from "express";
 import type { MonthlyData } from "../../types/MonthlyData.js";
 import type { ErrorMessage } from "../../types/Error.js";
 import { ErrorCode } from "../../types/ErrorCode.js";
+import { MONGO_COLLECTION_MONTHLY_DATA } from "../../mongo/connection.js";
 
-export function getMonthlyData(req: Request): MonthlyData {
+export async function getMonthlyData(req: Request): Promise<MonthlyData> {
     const year = Number(req.params.year);
     const month = Number(req.params.month);
 
@@ -16,44 +17,27 @@ export function getMonthlyData(req: Request): MonthlyData {
         throw error;
     }
 
+    const id = `${req.headers.userName}.${year}.${month}`;
+    let monthlyData = await MONGO_COLLECTION_MONTHLY_DATA.findOne({_id: id});
+    if (!monthlyData) {
+        monthlyData = createBlankMonthlyData(id, year, month);
+        await MONGO_COLLECTION_MONTHLY_DATA.insertOne(monthlyData);
+    }
+
+    return monthlyData;
+}
+
+function createBlankMonthlyData(id: string, year: number, month: number): MonthlyData {
     return {
+        _id: id,
         year: year,
         month: month,
-        costs: [{
-            day: 1,
-            amount: 1500,
-            category: 'other',
-            comment: 'megjegyzés'
-        },
-        {
-            day: 2,
-            amount: 3000,
-            category: 'other',
-            comment: 'megjegyzés 2'
-        }],
+        costs: [],
+        fixCosts: [],
+        incomes: [],
         goal: {
-            percentage: 100,
-            amount: 120000
-        },
-        incomes: [
-            {
-                name: 'munkabér',
-                amount: 500000
-            },
-            {
-                name: 'befektetések hozama',
-                amount: 20000
-            }
-        ],
-        fixCosts: [
-            {
-                name: 'bérlet',
-                amount: 9500
-            },
-            {
-                name: 'törlesztő',
-                amount: 250000
-            }
-        ]
+            percentage: 0,
+            amount: 0
+        }
     };
 }

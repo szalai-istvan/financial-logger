@@ -1,8 +1,9 @@
 import type { Request, Response } from "express";
 import { ErrorCode } from "../../types/ErrorCode.js";
 import type { ErrorMessage } from "../../types/Error.js";
+import { validateJwtToken } from "../../jwt/jwt.js";
 
-export function wrapRequest(req: Request, res: Response, handler: Function): void {
+export async function wrapAuthenticatedRequest(req: Request, res: Response, handler: Function): Promise<void> {
     if (!req) {
         createErrorResponse(res, {
             status: 400,
@@ -12,8 +13,16 @@ export function wrapRequest(req: Request, res: Response, handler: Function): voi
         return;
     }
 
+    if (!validateJwtToken(req)) {
+        createErrorResponse(res, {
+            status: 401,
+            errorCode: ErrorCode.UNAUTHORIZED,
+            message: 'Invalid JWT token!'
+        });
+    }
+
     try {
-        const result = handler(req);
+        const result = await handler(req);
         res.status(200).json(result);
     } catch(e) {
         const error = (e as ErrorMessage);
@@ -21,8 +30,8 @@ export function wrapRequest(req: Request, res: Response, handler: Function): voi
     }
 }
 
-export function createRequestWrapper(handler: Function): any {
-    return (req: Request, res: Response) => wrapRequest(req, res, handler);
+export function createAuthenticatedRequestWrapper(handler: Function): any {
+    return async (req: Request, res: Response) => wrapAuthenticatedRequest(req, res, handler);
 }
 
 function createErrorResponse(res: Response, error: ErrorMessage) {
