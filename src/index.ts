@@ -1,19 +1,21 @@
 import express from "express";
 
-import { getMonthlyData } from "./rest/monthly/monthlyRest.js";
-import { currentMonthlyView, monthlyView } from "./view/monthlyView.js";
-import { downloadScript } from "./view/downloadScript.js";
 import { loadEnvironment } from "./config/envLoader.js";
+import { connectToMongoDb } from "./mongo/connection.js";
+import { createNewCost } from "./rest/cost/createNewCost.rest.js";
+import { getMonthlyData } from "./rest/monthly/monthlyRest.rest.js";
 import { createAuthenticatedRequestWrapper } from "./rest/wrapRequest/wrapRequest.js";
+import { downloadScript } from "./view/downloadScript.js";
 import { downloadStylesheet } from "./view/downloadStylesheet.js";
-import { createNewCost } from "./rest/cost/createNewCost.js";
-import { connectToMongoDb, MONGO_COLLECTION_MONTHLY_DATA } from "./mongo/connection.js";
+import { currentMonthlyView, monthlyView } from "./view/monthlyView.js";
+import bodyParser from "body-parser";
 
 loadEnvironment();
 connectToMongoDb();
 
 const app = express();
-app.use(express.json());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // REST
 app.get('/rest/monthly/:year/:month', createAuthenticatedRequestWrapper(getMonthlyData));

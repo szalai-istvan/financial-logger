@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import path from "path";
 import { processTemplate } from "./templates/templateProcessor.js";
 import { MONTH_NAMES } from "../constants/constants.js";
+import { getCurrentDate } from "../helpers/currentDate.helper.js";
 
 export function monthlyView(req: Request, res: Response) {
     const year = Number(req.params.year);
@@ -30,9 +31,9 @@ export function monthlyView(req: Request, res: Response) {
 }
 
 export function currentMonthlyView(req: Request, res: Response) {
-    const currentDate = new Date();
-    const year = currentDate.getUTCFullYear();
-    const month = currentDate.getUTCMonth() + 1;
+    const currentDate = getCurrentDate();
+    const year = currentDate.year;
+    const month = currentDate.month;
 
     res.redirect(301, `/view/monthly/${year}/${month}`);
 }

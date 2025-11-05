@@ -1,8 +1,8 @@
 import type { Request } from "express";
-import type { MonthlyData } from "../../types/MonthlyData.js";
-import type { ErrorMessage } from "../../types/Error.js";
-import { ErrorCode } from "../../types/ErrorCode.js";
 import { MONGO_COLLECTION_MONTHLY_DATA } from "../../mongo/connection.js";
+import type { MonthlyData } from "../../types/monthlyData.type.js";
+import { ErrorCode, type ErrorMessage } from "../../types/errors.type.js";
+import { getMonthlyCostId } from "../../helpers/id.helper.js";
 
 export async function getMonthlyData(req: Request): Promise<MonthlyData> {
     const year = Number(req.params.year);
@@ -17,7 +17,7 @@ export async function getMonthlyData(req: Request): Promise<MonthlyData> {
         throw error;
     }
 
-    const id = `${req.headers.userName}.${year}.${month}`;
+    const id = getMonthlyCostId(req, year, month);
     let monthlyData = await MONGO_COLLECTION_MONTHLY_DATA.findOne({_id: id});
     if (!monthlyData) {
         monthlyData = createBlankMonthlyData(id, year, month);

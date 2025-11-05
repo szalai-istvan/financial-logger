@@ -9,10 +9,11 @@ export interface MonthlyData {
 }
 
 export interface Cost {
+    _id: string,
     day: number,
     amount: number,
     category: string,
-    comment: string
+    comment: string | undefined
 }
 
 export interface Income {

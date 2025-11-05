@@ -3,6 +3,7 @@ const costTableTbody = 'costTableTbody';
 const incomeTableTbody = 'incomeTableTbody';
 const fixCostTableTbody = 'fixCostTableTbody';
 
+
 const GET_MONTHLY_DATA_URL = `/rest/monthly/${year}/${month}`;
 let CURRENT_MONTHLY_DATA = null;
 

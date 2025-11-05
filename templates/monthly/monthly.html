@@ -5,14 +5,44 @@
     <meta charset="UTF-8" />
     <title>Havi nézet ${year}. ${monthName}</title>
     <link rel="stylesheet" href="/styles/common/common.css" />
+    <link rel="stylesheet" href="/styles/common/dialog.css" />
     ${templateConstants}
 </head>
 
 <body>
-    <div style="display: flex; justify-content: space-evenly; max-width: 1200px; margin-left: auto; margin-right: auto;">
+
+    <dialog id="addCostDialog">
+        <p class="dialogTitle">Költség hozzáadása</p>
+        <div class="dialogContainer">
+            <div class="form-row">
+                <label for="costDayInput">Nap: </label><br>
+                <input type="number" id="costDayInput" name="costDayInput" /><br>
+            </div>
+            <div class="form-row">
+                <label for="costAmountInput">Összeg: </label><br>
+                <input type="number" id="costAmountInput" name="costAmountInput" /><br>
+            </div>
+            <div class="form-row">
+                <label for="costCategoryInput">Kategória: </label><br>
+                <input type="text" id="costCategoryInput" name="costCategoryInput" /><br>
+            </div>
+            <div class="form-row">
+                <label for="costCommentInput">Megjegyzés: </label><br>
+                <input type="text" id="costCommentInput" name="costCommentInput" /><br>
+            </div>
+        </div>
+        <hr>
+        <div style="display: flex; justify-content: right;">
+            <button onclick="createCost()">Hozzáadás</button>
+            <button onclick="closeAddCostDialog()">Mégsem</button>
+        </div>
+    </dialog>
+
+    <div
+        style="display: flex; justify-content: space-evenly; max-width: 1200px; margin-left: auto; margin-right: auto;">
         <div id="leftColumnDiv" style="width: fit-content; display: block; float: left;">
             <div id="costTableDiv">
-                <button id="addCostButton">Hozzáadás</button>
+                <button id="addCostButton" onclick="openAddCostDialog()">Hozzáadás</button>
                 <button id="editCostButton">Módosítás</button>
                 <button id="deleteCostButton">Törlés</button>
 
@@ -104,6 +134,7 @@
     <script type="text/javascript" src="/script/common/restClient.js"></script>
 
     <script type="text/javascript" src="/script/monthly/monthlyData.js"></script>
+    <script type="text/javascript" src="/script/monthly/addCostDialog.js"></script>
 
 </body>
 

@@ -1,4 +1,4 @@
-import type { TemplateParameters } from "../../types/template.js";
+import type { TemplateParameters } from "../../types/template.type.js";
 import { getTemplate } from "./templateCache.js";
 
 const CONSTANTS_TEMPLATE_KEY = '${templateConstants}';

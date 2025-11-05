@@ -1,5 +1,5 @@
 import { Collection, MongoClient } from "mongodb";
-import type { MonthlyData } from "../types/MonthlyData.js";
+import type { MonthlyData } from "../types/monthlyData.type.js";
 
 const monthlyData = 'monthlyData';
 

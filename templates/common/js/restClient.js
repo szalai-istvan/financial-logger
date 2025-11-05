@@ -14,8 +14,15 @@ async function getJson(path) {
     return result;
 }
 
-async function postJson({path, header, body}) {
-    const response = await fetch(url, {method: POST, headers: headers, body: body});
+async function postJson({ url, headers, body }) {
+    const response = await fetch(url, {
+        method: POST,
+        headers: {
+            ...headers,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+    });
     if (!response.ok) {
         console.error(`postJson('${url}') failed.`);
         return undefined;
