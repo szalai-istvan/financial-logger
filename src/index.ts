@@ -45,6 +45,7 @@ app.delete('/rest/cost:year/:month/:costId', createAuthenticatedRequestWrapper(d
 
 // export data of user
 
+// register
 // login
 // logout
 
