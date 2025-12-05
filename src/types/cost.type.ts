@@ -10,3 +10,15 @@ export interface CreateCostRequestBody {
 export interface CreateCostResponseBody {
     id: string
 }
+
+export interface ModifyCostRequestBody extends CreateCostRequestBody {
+    id: string
+}
+
+export interface ModifyCostResponseBody {
+    id: string
+}
+
+export interface DeleteCostResponseBody {
+    id: string
+}

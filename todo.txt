@@ -1,7 +1,2 @@
-- Havi lekérdezés:
-    - Kategóriák összegyüjtése
-
-monthlyData
-    |-> username.year.month {
-        id: username.year.month
-    }
+put cost tesztelni
+delete cost tesztelni
