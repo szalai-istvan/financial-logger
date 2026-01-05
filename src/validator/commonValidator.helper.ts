@@ -1,7 +1,7 @@
 import type { Request } from "express";
 import { ErrorCode, type ErrorMessage } from "../types/errors.type.js";
 
-export function validateRequestBodyExists(req: Request) {
+function validateRequestBodyExists(req: Request) {
     if (!req.body) {
         const error: ErrorMessage = {
             message: 'req.body is missing!',
@@ -12,8 +12,9 @@ export function validateRequestBodyExists(req: Request) {
     }
 }
 
-export function validateRequestBodySchemaAndGet<T>(req: Request): T {
+function validateRequestBodySchemaAndGet<T>(req: Request): T {
     let body: T;
+    
     try {
         body = req.body as T;
         if (!body) {
@@ -35,3 +36,8 @@ export function validateRequestBodySchemaAndGet<T>(req: Request): T {
 
     return body;
 }
+
+export const CommonValidator = {
+    validateRequestBodyExists: validateRequestBodyExists,
+    validateRequestBodySchemaAndGet: validateRequestBodySchemaAndGet
+};

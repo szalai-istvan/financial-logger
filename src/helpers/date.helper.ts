@@ -1,4 +1,4 @@
-import type { SimpleDate } from "../types/datetime.type.js";
+import type { SimpleDate } from "../types/date/datetime.type.js";
 
 function getCurrentDate(): SimpleDate {
     const date = new Date();
