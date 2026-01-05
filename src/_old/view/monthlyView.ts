@@ -1,8 +1,8 @@
 import type { Request, Response } from "express";
 import path from "path";
 import { TemplateProcessor } from "./templates/templateProcessor.js";
-import { Constants } from "../constants/constants.js";
-import { DateHelper } from "../helpers/date.helper.js";
+import { DateHelper } from "../../helpers/date.helper.js";
+import { Constants } from "../../constants/constants.js";
 
 export function monthlyView(req: Request, res: Response) {
     const year = Number(req.params.year);

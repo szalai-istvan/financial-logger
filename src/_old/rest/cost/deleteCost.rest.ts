@@ -1,9 +1,8 @@
 import type { Request } from "express";
-import { getCurrentDate } from "../../helpers/date.helper.js";
-import { getMonthlyCostId } from "../../helpers/id.helper.js";
-import { MONGO_COLLECTION_MONTHLY_DATA } from "../../db/connection.js";
-import type { DeleteCostResponseBody } from "../../types/cost.type.js";
-import { ErrorCode, type ErrorMessage } from "../../types/errors.type.js";
+import type { DeleteCostResponseBody } from "../../../types/cost.type.js";
+import { ErrorCode, type ErrorMessage } from "../../../types/errors.type.js";
+import { DateHelper } from "../../../helpers/date.helper.js";
+import { IdHelper } from "../../../helpers/id.helper.js";
 
 export async function deleteCost(req: Request): Promise<DeleteCostResponseBody> {
     const year = Number(req.params.year);
@@ -19,7 +18,7 @@ export async function deleteCost(req: Request): Promise<DeleteCostResponseBody> 
         throw error;
     }
 
-    const currentDate = getCurrentDate();
+    const currentDate = DateHelper.getCurrentDate();
     if (year !== currentDate.year || month !== currentDate.month) {
         const error: ErrorMessage = {
             status: 400,
@@ -29,8 +28,9 @@ export async function deleteCost(req: Request): Promise<DeleteCostResponseBody> 
         throw error;
     }
 
-    const monthlyCostId = getMonthlyCostId(req, year, month);
-    await MONGO_COLLECTION_MONTHLY_DATA.updateOne({
+    const monthlyCostId = IdHelper.getMonthlyCostId(req, year, month);
+    /*
+       await MONGO_COLLECTION_MONTHLY_DATA.updateOne({
         "_id": monthlyCostId
     },
         {
@@ -41,8 +41,8 @@ export async function deleteCost(req: Request): Promise<DeleteCostResponseBody> 
             }
         },
     );
-
+*/
     return {
-        id: costId
+        id: ''
     };
 }

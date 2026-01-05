@@ -4,12 +4,13 @@ import { UserService } from "../service/user.service.js";
 import type { User } from "../types/db/user.type.js";
 import type { CreateUserRequest } from "../types/rest/CreateUserRequest.type.js";
 import type { CreateUserResponse } from "../types/rest/CreateUserResponse.type.js";
-import { CommonValidator } from "../validator/commonValidator.helper.js";
+import { CommonValidator } from "../validator/commonValidator.validator.js";
+import { UserValidator } from "../validator/user.validator.js";
 
 async function createUser(req: Request): Promise<CreateUserResponse> {
     CommonValidator.validateRequestBodyExists(req);
 
-    const requestBody = validateAndGetRequestBody(req);
+    const requestBody = await validateAndGetRequestBody(req);
     const user = createUserEntity(requestBody);
     const resultId = await UserService.save(user);
 
@@ -19,14 +20,9 @@ async function createUser(req: Request): Promise<CreateUserResponse> {
     };
 }
 
-function validateAndGetRequestBody(req: Request): CreateUserRequest {
+async function validateAndGetRequestBody(req: Request): Promise<CreateUserRequest> {
     const body = CommonValidator.validateRequestBodySchemaAndGet<CreateUserRequest>(req);
-
-    // run validations:
-    //      1. userName uniqueness
-    //      2. userName and password requirements
-    //      3. email format
-
+    await UserValidator.validateCreateUserRequest(body);
     return body;
 }
 
@@ -35,7 +31,7 @@ function createUserEntity(requestBody: CreateUserRequest): User {
         _id: IdHelper.createUniqueId(),
         userName: requestBody.userName,
         email: requestBody.email,
-        password: requestBody.password,
+        password: requestBody.password, // TODO: Hash password
         lastLogin: undefined
     };
 }

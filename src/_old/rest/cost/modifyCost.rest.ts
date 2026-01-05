@@ -1,13 +1,12 @@
 import type { Request } from "express";
-import { getCurrentDate } from "../../helpers/date.helper.js";
-import { validateRequestBodyExists, validateRequestBodySchemaAndGet } from "../../validator/validator.helper.js";
-import type { ModifyCostRequestBody, ModifyCostResponseBody } from "../../types/cost.type.js";
-import { ErrorCode, type ErrorMessage } from "../../types/errors.type.js";
-import { MONGO_COLLECTION_MONTHLY_DATA } from "../../db/connection.js";
-import { getMonthlyCostId } from "../../helpers/id.helper.js";
+import type { ModifyCostRequestBody, ModifyCostResponseBody } from "../../../types/cost.type.js";
+import { CommonValidator } from "../../../validator/commonValidator.validator.js";
+import { ErrorCode, type ErrorMessage } from "../../../types/errors.type.js";
+import { DateHelper } from "../../../helpers/date.helper.js";
+import { IdHelper } from "../../../helpers/id.helper.js";
 
-export function modifyCost(req: Request): ModifyCostResponseBody {
-    validateRequestBodyExists(req);
+export function modifyCost(req: Request): ModifyCostResponseBody | null {
+    CommonValidator.validateRequestBodyExists(req);
 
     const requestBody = validateAndGetRequestBody(req);
     try {
@@ -23,12 +22,12 @@ export function modifyCost(req: Request): ModifyCostResponseBody {
 }
 
 function validateAndGetRequestBody(req: Request): ModifyCostRequestBody {
-    const body = validateRequestBodySchemaAndGet<ModifyCostRequestBody>(req);
+    const body = CommonValidator.validateRequestBodySchemaAndGet<ModifyCostRequestBody>(req);
 
     const year = body.year;
     const month = body.month;
 
-    const currentDate = getCurrentDate();
+    const currentDate = DateHelper.getCurrentDate();
     if (year !== currentDate.year || month !== currentDate.month) {
         const error: ErrorMessage = {
             status: 400,
@@ -41,9 +40,10 @@ function validateAndGetRequestBody(req: Request): ModifyCostRequestBody {
     return body;
 }
 
-function saveCost(req: Request, requestBody: ModifyCostRequestBody): ModifyCostResponseBody {
+function saveCost(req: Request, requestBody: ModifyCostRequestBody): ModifyCostResponseBody | null {
     const id = requestBody.id;
-    const monthlyCostId = getMonthlyCostId(req, requestBody.year, requestBody.month);
+    const monthlyCostId = IdHelper.getMonthlyCostId(req, requestBody.year, requestBody.month);
+    /*
     MONGO_COLLECTION_MONTHLY_DATA.updateOne(
         {
             _id: monthlyCostId,
@@ -59,5 +59,6 @@ function saveCost(req: Request, requestBody: ModifyCostRequestBody): ModifyCostR
         }
     );
 
-    return { id: id };
+    return { id: id };*/
+    return null;
 }

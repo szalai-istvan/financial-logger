@@ -35,6 +35,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // update fixed budget
 // delete fixed budget
 
+// create investment
+// update investment
+// delete investment
+
+// set annual goal
 // update annual goal
 // update monthly goal
 
@@ -47,6 +52,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.post('/rest/user', RequestWrapper.createRequestWrapper(CreateUserAction.createUser));
 // login
 // logout
+// password reset
+// delete user
 
 // views
 // app.get('/script/:subdirectory/:filename', downloadScript);

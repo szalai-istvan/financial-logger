@@ -1,4 +1,4 @@
-import type { TemplateParameters } from "../../types/template.type.js";
+import type { TemplateParameters } from "../../../types/template.type.js";
 import { TemplateLoader } from "./templateLoader.js";
 
 const CONSTANTS_TEMPLATE_KEY = '${templateConstants}';

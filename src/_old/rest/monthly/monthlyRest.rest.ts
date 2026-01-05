@@ -1,10 +1,9 @@
 import type { Request } from "express";
-import { MONGO_COLLECTION_MONTHLY_DATA } from "../../db/connection.js";
-import type { MonthlyData } from "../../types/monthlyData.type.js";
-import { ErrorCode, type ErrorMessage } from "../../types/errors.type.js";
-import { getMonthlyCostId } from "../../helpers/id.helper.js";
+import type { MonthlyData } from "../../../types/monthlyData.type.js";
+import { ErrorCode, type ErrorMessage } from "../../../types/errors.type.js";
+import { IdHelper } from "../../../helpers/id.helper.js";
 
-export async function getMonthlyData(req: Request): Promise<MonthlyData> {
+export async function getMonthlyData(req: Request): Promise<MonthlyData | null> {
     const year = Number(req.params.year);
     const month = Number(req.params.month);
 
@@ -17,14 +16,15 @@ export async function getMonthlyData(req: Request): Promise<MonthlyData> {
         throw error;
     }
 
-    const id = getMonthlyCostId(req, year, month);
-    let monthlyData = await MONGO_COLLECTION_MONTHLY_DATA.findOne({_id: id});
-    if (!monthlyData) {
-        monthlyData = createBlankMonthlyData(id, year, month);
-        await MONGO_COLLECTION_MONTHLY_DATA.insertOne(monthlyData);
-    }
+    const id = IdHelper.getMonthlyCostId(req, year, month);
+    //let monthlyData = await MONGO_COLLECTION_MONTHLY_DATA.findOne({_id: id});
+    //if (!monthlyData) {
+    //    monthlyData = createBlankMonthlyData(id, year, month);
+    //    await MONGO_COLLECTION_MONTHLY_DATA.insertOne(monthlyData);
+    //}
 
-    return monthlyData;
+    //return monthlyData;
+    return null;
 }
 
 function createBlankMonthlyData(id: string, year: number, month: number): MonthlyData {
