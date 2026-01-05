@@ -38,6 +38,7 @@ function checkRequestExists(req: Request): void {
 
 function createErrorResponse(res: Response, e: any) {
     try {
+        console.error(e);
         const error = (e as ErrorMessage);
         res.status(error.status).json({
             errorCode: error.errorCode,

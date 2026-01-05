@@ -6,12 +6,13 @@ import type { CreateUserRequest } from "../types/rest/CreateUserRequest.type.js"
 import type { CreateUserResponse } from "../types/rest/CreateUserResponse.type.js";
 import { CommonValidator } from "../validator/commonValidator.validator.js";
 import { UserValidator } from "../validator/user.validator.js";
+import * as argon2 from "argon2";
 
 async function createUser(req: Request): Promise<CreateUserResponse> {
     CommonValidator.validateRequestBodyExists(req);
 
     const requestBody = await validateAndGetRequestBody(req);
-    const user = createUserEntity(requestBody);
+    const user = await createUserEntity(requestBody);
     const resultId = await UserService.save(user);
 
     return {
@@ -26,12 +27,12 @@ async function validateAndGetRequestBody(req: Request): Promise<CreateUserReques
     return body;
 }
 
-function createUserEntity(requestBody: CreateUserRequest): User {
+async function createUserEntity(requestBody: CreateUserRequest): Promise<User> {
     return {
         _id: IdHelper.createUniqueId(),
         userName: requestBody.userName,
         email: requestBody.email,
-        password: requestBody.password, // TODO: Hash password
+        password: await argon2.hash(requestBody.password),
         lastLogin: undefined
     };
 }
