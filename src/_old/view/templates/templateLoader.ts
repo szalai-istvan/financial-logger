@@ -2,7 +2,7 @@ import fs from "fs";
 
 const TEMPLATE_CACHE: { [key: string]: string } = {};
 
-export function getTemplate(path: string): string {
+function getTemplate(path: string): string {
     if (!Number(process.env.TEMPLATE_CACHE_ENABLED)) {
         return fs.readFileSync(path).toString();
     }
@@ -15,3 +15,7 @@ export function getTemplate(path: string): string {
     TEMPLATE_CACHE[path] = template;
     return template;
 }
+
+export const TemplateLoader = {
+    getTemplate: getTemplate
+};

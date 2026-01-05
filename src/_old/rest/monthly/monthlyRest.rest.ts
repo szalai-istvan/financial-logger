@@ -1,5 +1,5 @@
 import type { Request } from "express";
-import { MONGO_COLLECTION_MONTHLY_DATA } from "../../mongo/connection.js";
+import { MONGO_COLLECTION_MONTHLY_DATA } from "../../db/connection.js";
 import type { MonthlyData } from "../../types/monthlyData.type.js";
 import { ErrorCode, type ErrorMessage } from "../../types/errors.type.js";
 import { getMonthlyCostId } from "../../helpers/id.helper.js";

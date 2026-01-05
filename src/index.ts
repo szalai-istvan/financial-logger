@@ -1,8 +1,8 @@
 import express from "express";
 
 import bodyParser from "body-parser";
-import { loadEnvironment } from "./config/envLoader.js";
-import { connectToMongoDb } from "./mongo/connection.js";
+import { Config } from "./config/config.js";
+import { Mongo } from "./db/connection.js";
 import { createNewCost } from "./rest/cost/createNewCost.rest.js";
 import { deleteCost } from "./rest/cost/deleteCost.rest.js";
 import { modifyCost } from "./rest/cost/modifyCost.rest.js";
@@ -12,8 +12,8 @@ import { downloadScript } from "./view/downloadScript.js";
 import { downloadStylesheet } from "./view/downloadStylesheet.js";
 import { currentMonthlyView, monthlyView } from "./view/monthlyView.js";
 
-loadEnvironment();
-connectToMongoDb();
+Config.loadEnvironment();
+Mongo.connectToMongoDb();
 
 const app = express();
 app.use(bodyParser.json());
@@ -36,6 +36,10 @@ app.delete('/rest/cost:year/:month/:costId', createAuthenticatedRequestWrapper(d
 // create new income
 // update income
 // delete income
+
+// create new budget
+// update fixed budget
+// delete fixed budget
 
 // update annual goal
 // update monthly goal

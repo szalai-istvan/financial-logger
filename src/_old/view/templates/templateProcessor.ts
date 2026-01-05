@@ -1,11 +1,11 @@
 import type { TemplateParameters } from "../../types/template.type.js";
-import { getTemplate } from "./templateCache.js";
+import { TemplateLoader } from "./templateLoader.js";
 
 const CONSTANTS_TEMPLATE_KEY = '${templateConstants}';
 const CONSTANTS_TEMPLATE_TAG = '<script>\n${templateConstants}\n</script>';
 
-export function processTemplate(path: string, parameters: TemplateParameters): string {
-    let template = getTemplate(path);
+function processTemplate(path: string, parameters: TemplateParameters): string {
+    let template = TemplateLoader.getTemplate(path);
 
     const params = parameters.parameters;
     for (let key in params) {
@@ -13,7 +13,7 @@ export function processTemplate(path: string, parameters: TemplateParameters): s
         const value = (params[key] || '').toString();
         template = template.replaceAll(templateKey, value);
     }
-    
+
     const templateConstants = parameters.templateConstants;
     let constantsString = '';
     for (let key in templateConstants) {
@@ -29,3 +29,7 @@ export function processTemplate(path: string, parameters: TemplateParameters): s
 function toConstantVariable(variableName: string, variableValue: string | number | boolean | undefined): string {
     return `const ${variableName} = ${variableValue};\n`;
 }
+
+export const TemplateProcessor = {
+    processTemplate: processTemplate
+};

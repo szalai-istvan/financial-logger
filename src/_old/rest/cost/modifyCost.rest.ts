@@ -1,9 +1,9 @@
 import type { Request } from "express";
-import { getCurrentDate } from "../../helpers/currentDate.helper.js";
-import { validateRequestBodyExists, validateRequestBodySchemaAndGet } from "../../helpers/validator.helper.js";
+import { getCurrentDate } from "../../helpers/date.helper.js";
+import { validateRequestBodyExists, validateRequestBodySchemaAndGet } from "../../validator/validator.helper.js";
 import type { ModifyCostRequestBody, ModifyCostResponseBody } from "../../types/cost.type.js";
 import { ErrorCode, type ErrorMessage } from "../../types/errors.type.js";
-import { MONGO_COLLECTION_MONTHLY_DATA } from "../../mongo/connection.js";
+import { MONGO_COLLECTION_MONTHLY_DATA } from "../../db/connection.js";
 import { getMonthlyCostId } from "../../helpers/id.helper.js";
 
 export function modifyCost(req: Request): ModifyCostResponseBody {

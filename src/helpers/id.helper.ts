@@ -1,9 +1,14 @@
 import type { Request } from "express";
 
-export function createUniqueId(): string {
+function createUniqueId(): string {
     return Math.random().toString().substring(2) + Math.random().toString().substring(2);
 }
 
-export function getMonthlyCostId(req: Request, year: number, month: number): string {
+function getMonthlyCostId(req: Request, year: number, month: number): string {
     return `${req.headers.userName}.${year}.${month}`;
 }
+
+export const IdHelper = {
+    createUniqueId: createUniqueId,
+    getMonthlyCostId: getMonthlyCostId
+};

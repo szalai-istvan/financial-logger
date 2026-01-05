@@ -1,8 +1,8 @@
 import type { Request, Response } from "express";
 import path from "path";
-import { processTemplate } from "./templates/templateProcessor.js";
-import { MONTH_NAMES } from "../constants/constants.js";
-import { getCurrentDate } from "../helpers/currentDate.helper.js";
+import { TemplateProcessor } from "./templates/templateProcessor.js";
+import { Constants } from "../constants/constants.js";
+import { DateHelper } from "../helpers/date.helper.js";
 
 export function monthlyView(req: Request, res: Response) {
     const year = Number(req.params.year);
@@ -19,19 +19,19 @@ export function monthlyView(req: Request, res: Response) {
         parameters: {
             year: year,
             month: month,
-            monthName: MONTH_NAMES[month] || ''
+            monthName: Constants.monthNames[month] || ''
         },
         templateConstants: {
             year: year,
             month: month
         }
     };
-    const template = processTemplate(templatePath, params);
+    const template = TemplateProcessor.processTemplate(templatePath, params);
     res.send(template);
 }
 
 export function currentMonthlyView(req: Request, res: Response) {
-    const currentDate = getCurrentDate();
+    const currentDate = DateHelper.getCurrentDate();
     const year = currentDate.year;
     const month = currentDate.month;
 

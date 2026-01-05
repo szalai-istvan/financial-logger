@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { ErrorCode, type ErrorMessage } from "../../types/errors.type.js";
-import { validateJwtToken } from "../../jwt/jwt.js";
+import { validateJwtToken } from "../../auth/auth.js";
 
 export async function wrapAuthenticatedRequest(req: Request, res: Response, handler: Function): Promise<void> {
     if (!req) {

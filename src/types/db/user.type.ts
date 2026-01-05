@@ -1,4 +1,4 @@
-import type { SimpleDate } from "./misc.type.js";
+import type { SimpleDate } from "../datetime.type.js";
 
 export interface User {
     username: string,
