@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pénzügyi Tervező Dashboard</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        slateHeader: '#2D3748',
+                        accentGray: '#E2E8F0',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom smooth scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-sans min-h-screen flex flex-col transition-colors duration-200">
+
+    <header class="bg-slate-800 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-blue-600 p-2 rounded-lg text-white shadow">
+                        <i class="fa-solid font-bold fa-wallet text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-lg leading-tight">Pénzügyi Tervező</h1>
+                        <p class="text-xs text-slate-400">Személyes költségvetés-kezelő</p>
+                    </div>
+                </div>
+
+                <!-- Control Buttons -->
+                <div class="flex items-center space-x-2 sm:space-x-4">
+                    <button id="themeToggleBtn" onclick="toggleDarkMode()" class="p-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 transition" title="Sötét/Világos mód">
+                        <i class="fa-solid fa-moon text-sm sm:text-base"></i>
+                    </button>
+                    <button onclick="exportData()" class="px-3 py-1.5 text-xs sm:text-sm bg-slate-700 hover:bg-slate-600 text-white rounded-lg flex items-center gap-1.5 transition">
+                        <i class="fa-solid fa-download"></i> <span class="hidden sm:inline">Exportál</span>
+                    </button>
+                    <label class="px-3 py-1.5 text-xs sm:text-sm bg-slate-700 hover:bg-slate-600 text-white rounded-lg flex items-center gap-1.5 cursor-pointer transition">
+                        <i class="fa-solid fa-upload"></i> <span class="hidden sm:inline">Importál</span>
+                        <input type="file" id="importFileInput" onchange="importData(event)" class="hidden" accept=".json">
+                    </label>
+                    <button onclick="resetData()" class="px-3 py-1.5 text-xs sm:text-sm bg-red-600/80 hover:bg-red-600 text-white rounded-lg flex items-center gap-1.5 transition" title="Minden adat törlése">
+                        <i class="fa-solid fa-rotate-left"></i> <span class="hidden sm:inline">Alaphelyzet</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab Navigation Header -->
+            <div class="flex space-x-1 border-b border-slate-700 mt-1">
+                <button id="tab1Btn" onclick="switchTab(1)" class="px-5 py-2.5 font-medium text-sm rounded-t-lg transition border-b-2 border-blue-500 bg-slate-700 text-white flex items-center gap-2">
+                    <i class="fa-solid fa-chart-pie text-xs"></i>
+                    1. Költségek és Összefoglaló
+                </button>
+                <button id="tab2Btn" onclick="switchTab(2)" class="px-5 py-2.5 font-medium text-sm rounded-t-lg transition border-b-2 border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-700/50 flex items-center gap-2">
+                    <i class="fa-solid fa-hand-holding-dollar text-xs"></i>
+                    2. Bevételek és Fix költségek
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
+
+        <!-- TAB 1: Költségek és Összefoglaló -->
+        <div id="tab1" class="block transition-opacity duration-300">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+                <!-- Left side: Expenses Main Table (Column width 7/12) -->
+                <div class="lg:col-span-7 bg-white dark:bg-slate-800 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col">
+                    <div class="bg-slate-700 dark:bg-slate-900 text-white px-4 py-3 flex justify-between items-center border-b border-slate-600">
+                        <h2 class="font-bold flex items-center gap-2 text-base">
+                            <i class="fa-solid fa-receipt text-slate-300"></i> Költségek
+                        </h2>
+                        <button onclick="addExpenseRow()" class="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded shadow transition flex items-center gap-1">
+                            <i class="fa-solid fa-plus"></i> Új költség
+                        </button>
+                    </div>
+
+                    <div class="overflow-x-auto flex-1">
+                        <table class="w-full text-left text-xs sm:text-sm">
+                            <thead class="bg-slate-200 dark:bg-slate-700/60 text-slate-700 dark:text-slate-200 font-semibold uppercase tracking-wider text-[11px]">
+                                <tr>
+                                    <th class="py-2.5 px-3 w-16 text-center">Nap</th>
+                                    <th class="py-2.5 px-3 w-28 text-right">Összeg (Ft)</th>
+                                    <th class="py-2.5 px-3 w-44">Kategória</th>
+                                    <th class="py-2.5 px-3">Megjegyzés</th>
+                                    <th class="py-2.5 px-2 w-10 text-center"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="expenseTableBody" class="divide-y divide-slate-200 dark:divide-slate-700">
+                                <!-- Dynamic Expense Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="p-3 bg-slate-50 dark:bg-slate-800/80 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center text-xs font-semibold text-slate-600 dark:text-slate-300">
+                        <span id="expenseCountLabel">0 tétel</span>
+                        <div>Összesen: <span id="expenseTotalFooter" class="text-sm font-bold text-slate-900 dark:text-white">0 Ft</span></div>
+                    </div>
+                </div>
+
+                <!-- Right Side Panel Cards (Column width 5/12) -->
+                <div class="lg:col-span-5 space-y-5">
+
+                    <!-- Vállalás Panel -->
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 overflow-hidden">
+                        <div class="bg-slate-700 dark:bg-slate-900 text-white px-4 py-2.5 font-bold text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-bullseye text-blue-400"></i> Vállalás
+                        </div>
+                        <div class="p-4 space-y-3">
+                            <div class="flex items-center justify-between gap-4">
+                                <label class="text-xs font-medium text-slate-600 dark:text-slate-300">Séma:</label>
+                                <select id="schemaSelect" onchange="updateCalculations()" class="text-xs bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded px-2 py-1.5 focus:ring-2 focus:ring-blue-500 outline-none w-48">
+                                    <option value="terv">Terv szerint</option>
+                                    <option value="szigorú">Szigorú megtakarítás</option>
+                                    <option value="rugalmas">Rugalmas keret</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center justify-between gap-4">
+                                <label class="text-xs font-medium text-slate-600 dark:text-slate-300">Cél megtakarítás:</label>
+                                <div class="flex items-center gap-1">
+                                    <input type="number" id="savingsGoalInput" value="50000" oninput="updateCalculations()" class="text-xs text-right font-semibold bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded px-2 py-1.5 focus:ring-2 focus:ring-blue-500 outline-none w-32">
+                                    <span class="text-xs text-slate-500 font-medium">Ft</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hó eleji összegzés Panel -->
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 overflow-hidden">
+                        <div class="bg-slate-700 dark:bg-slate-900 text-white px-4 py-2.5 font-bold text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-calendar-check text-emerald-400"></i> Hó eleji összegzés
+                        </div>
+                        <div class="p-3 text-xs space-y-2">
+                            <div class="flex justify-between py-1 border-b border-slate-100 dark:border-slate-700/50">
+                                <span class="text-slate-600 dark:text-slate-300">Összes bevétel:</span>
+                                <span id="sumTotalIncome" class="font-bold text-slate-800 dark:text-slate-100">0 Ft</span>
+                            </div>
+                            <div class="flex justify-between py-1 border-b border-slate-100 dark:border-slate-700/50">
+                                <span class="text-slate-600 dark:text-slate-300">Össz fix költség:</span>
+                                <span id="sumTotalFixedCost" class="font-bold text-slate-800 dark:text-slate-100">0 Ft</span>
+                            </div>
+                            <div class="flex justify-between py-1 border-b border-slate-100 dark:border-slate-700/50">
+                                <span class="font-semibold text-slate-700 dark:text-slate-200">Elkölthető összeg:</span>
+                                <span id="sumDisposableAmount" class="font-bold text-blue-600 dark:text-blue-400">0 Ft</span>
+                            </div>
+                            <div class="flex justify-between py-1 border-b border-slate-100 dark:border-slate-700/50">
+                                <span class="text-slate-600 dark:text-slate-300">Napi keret (célra):</span>
+                                <span id="sumDailyTarget" class="font-semibold text-slate-800 dark:text-slate-100">0 Ft</span>
+                            </div>
+                            <div class="flex justify-between py-1">
+                                <span class="text-slate-600 dark:text-slate-300">Napi keret (0-ra):</span>
+                                <span id="sumDailyZero" class="font-semibold text-slate-800 dark:text-slate-100">0 Ft</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Összefoglaló Panel -->
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 overflow-hidden">
+                        <div class="bg-slate-700 dark:bg-slate-900 text-white px-4 py-2.5 font-bold text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-chart-line text-amber-400"></i> Összefoglaló
+                        </div>
+                        <div class="p-3 text-xs space-y-2">
+                            <div class="flex justify-between py-1 border-b border-slate-100 dark:border-slate-700/50">
+                                <span class="text-slate-600 dark:text-slate-300">Összes kiadás:</span>
+                                <span id="sumTotalExpenses" class="font-bold text-red-600 dark:text-red-400">0 Ft</span>
+                            </div>
+                            <div class="flex justify-between py-1 border-b border-slate-100 dark:border-slate-700/50">
+                                <span class="text-slate-600 dark:text-slate-300">Ma elkölthető összeg:</span>
+                                <span id="sumSpendableToday" class="font-bold text-slate-800 dark:text-slate-100">0 Ft</span>
+                            </div>
+                            <div class="flex justify-between py-1 border-b border-slate-100 dark:border-slate-700/50">
+                                <span class="text-slate-600 dark:text-slate-300">Eddigi megtakarítás:</span>
+                                <span id="sumCurrentSavings" class="font-bold text-emerald-600 dark:text-emerald-400">0 Ft</span>
+                            </div>
+                            <div class="flex justify-between py-1 border-b border-slate-100 dark:border-slate-700/50">
+                                <span class="text-slate-600 dark:text-slate-300">Előrejelzett megtakarítás:</span>
+                                <span id="sumProjectedSavings" class="font-semibold text-slate-800 dark:text-slate-100">0 Ft</span>
+                            </div>
+                            <div class="flex justify-between py-1 border-b border-slate-100 dark:border-slate-700/50">
+                                <span class="text-slate-600 dark:text-slate-300">Befektetve a hónapban:</span>
+                                <input type="number" id="sumInvestedInput" value="0" oninput="updateCalculations()" class="text-xs text-right font-semibold bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded px-1.5 py-0.5 w-24 outline-none focus:ring-1 focus:ring-blue-500">
+                            </div>
+                            <div class="flex justify-between py-1 border-b border-slate-100 dark:border-slate-700/50">
+                                <span class="text-slate-600 dark:text-slate-300">Összvagyon (hó végén):</span>
+                                <span id="sumTotalWealth" class="font-bold text-indigo-600 dark:text-indigo-400">0 Ft</span>
+                            </div>
+                            <div class="flex justify-between py-1">
+                                <span class="text-slate-600 dark:text-slate-300">Adósság (hó végén):</span>
+                                <input type="number" id="sumDebtInput" value="0" oninput="updateCalculations()" class="text-xs text-right font-semibold bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded px-1.5 py-0.5 w-24 outline-none focus:ring-1 focus:ring-blue-500 text-red-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kiadások kategóriánként Panel -->
+                    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 overflow-hidden">
+                        <div class="bg-slate-700 dark:bg-slate-900 text-white px-4 py-2.5 font-bold text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-list-check text-purple-400"></i> Kiadások kategóriánként
+                        </div>
+                        <div id="categoryBreakdownContainer" class="p-3 text-xs space-y-2">
+                            <!-- Category items dynamically loaded here -->
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: Bevételek és Fix költségek -->
+        <div id="tab2" class="hidden transition-opacity duration-300">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                <!-- Bevételek (Income) Table -->
+                <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col">
+                    <div class="bg-slate-700 dark:bg-slate-900 text-white px-4 py-3 flex justify-between items-center border-b border-slate-600">
+                        <h2 class="font-bold flex items-center gap-2 text-base">
+                            <i class="fa-solid fa-arrow-down-long text-emerald-400"></i> Bevételek
+                        </h2>
+                        <button onclick="addIncomeRow()" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded shadow transition flex items-center gap-1">
+                            <i class="fa-solid fa-plus"></i> Új bevétel
+                        </button>
+                    </div>
+
+                    <div class="overflow-x-auto flex-1">
+                        <table class="w-full text-left text-xs sm:text-sm">
+                            <thead class="bg-slate-200 dark:bg-slate-700/60 text-slate-700 dark:text-slate-200 font-semibold uppercase tracking-wider text-[11px]">
+                                <tr>
+                                    <th class="py-2.5 px-3">Név</th>
+                                    <th class="py-2.5 px-3 w-36 text-right">Összeg (Ft)</th>
+                                    <th class="py-2.5 px-2 w-10 text-center"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="incomeTableBody" class="divide-y divide-slate-200 dark:divide-slate-700">
+                                <!-- Dynamic Income Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="p-3 bg-slate-50 dark:bg-slate-800/80 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center text-xs font-semibold text-slate-600 dark:text-slate-300">
+                        <span id="incomeCountLabel">0 tétel</span>
+                        <div>Összesen: <span id="incomeTotalFooter" class="text-sm font-bold text-emerald-600 dark:text-emerald-400">0 Ft</span></div>
+                    </div>
+                </div>
+
+                <!-- Fix költségek (Fixed Expenses) Table -->
+                <div class="bg-white dark:bg-slate-800 rounded-xl shadow-md border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col">
+                    <div class="bg-slate-700 dark:bg-slate-900 text-white px-4 py-3 flex justify-between items-center border-b border-slate-600">
+                        <h2 class="font-bold flex items-center gap-2 text-base">
+                            <i class="fa-solid fa-lock text-amber-400"></i> Fix költségek
+                        </h2>
+                        <button onclick="addFixedExpenseRow()" class="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded shadow transition flex items-center gap-1">
+                            <i class="fa-solid fa-plus"></i> Új fix költség
+                        </button>
+                    </div>
+
+                    <div class="overflow-x-auto flex-1">
+                        <table class="w-full text-left text-xs sm:text-sm">
+                            <thead class="bg-slate-200 dark:bg-slate-700/60 text-slate-700 dark:text-slate-200 font-semibold uppercase tracking-wider text-[11px]">
+                                <tr>
+                                    <th class="py-2.5 px-3">Név</th>
+                                    <th class="py-2.5 px-3 w-36 text-right">Összeg (Ft)</th>
+                                    <th class="py-2.5 px-2 w-10 text-center"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="fixedExpenseTableBody" class="divide-y divide-slate-200 dark:divide-slate-700">
+                                <!-- Dynamic Fixed Expense Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="p-3 bg-slate-50 dark:bg-slate-800/80 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center text-xs font-semibold text-slate-600 dark:text-slate-300">
+                        <span id="fixedExpenseCountLabel">0 tétel</span>
+                        <div>Összesen: <span id="fixedExpenseTotalFooter" class="text-sm font-bold text-red-600 dark:text-red-400">0 Ft</span></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Custom Notification Toast -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-slate-800 text-white px-4 py-2.5 rounded-lg shadow-xl text-xs sm:text-sm font-medium transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-2 z-50">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400"></i>
+        <span id="toastMsg">Üzenet</span>
+    </div>
+
+    <script>
+        // Default categories as requested
+        const CATEGORIES = [
+            'Élelmiszer',
+            'Egyéb bevásárlás',
+            'Készétel',
+            'Közlekedés',
+            'Digitális szolgáltatások',
+            'Egészség / Szépség',
+            'Szórakozás',
+            'Otthon / Rezsik',
+            'Egyéb'
+        ];
+
+        // State object
+        let appState = {
+            expenses: [
+                { id: 1, day: 1, amount: 4500, category: 'Élelmiszer', note: 'Heti bevásárlás' },
+                { id: 2, day: 3, amount: 1200, category: 'Közlekedés', note: 'BKV jegy' },
+                { id: 3, day: 5, amount: 3500, category: 'Készétel', note: 'Ebédfutár' },
+                { id: 4, day: 8, amount: 2990, category: 'Digitális szolgáltatások', note: 'Netflix' }
+            ],
+            incomes: [
+                { id: 1, name: 'Fizetés', amount: 450000 },
+                { id: 2, name: 'Mellékes / Freelance', amount: 50000 }
+            ],
+            fixedExpenses: [
+                { id: 1, name: 'Lakbér / Törlesztő', amount: 140000 },
+                { id: 2, name: 'Rezsi (áram, gáz, víz)', amount: 35000 },
+                { id: 3, name: 'Mobil & Internet', amount: 12000 }
+            ],
+            goal: 50000,
+            schema: 'terv',
+            invested: 0,
+            debt: 0
+        };
+
+        // Format currency to Hungarian Ft
+        function formatFt(val) {
+            const num = Math.round(Number(val) || 0);
+            return num.toLocaleString('hu-HU') + ' Ft';
+        }
+
+        // Days in month calculation (default 30 days)
+        const DAYS_IN_MONTH = 30;
+
+        function switchTab(tabIndex) {
+            const tab1 = document.getElementById('tab1');
+            const tab2 = document.getElementById('tab2');
+            const tab1Btn = document.getElementById('tab1Btn');
+            const tab2Btn = document.getElementById('tab2Btn');
+
+            if (tabIndex === 1) {
+                tab1.classList.remove('hidden');
+                tab2.classList.add('hidden');
+                
+                tab1Btn.className = "px-5 py-2.5 font-medium text-sm rounded-t-lg transition border-b-2 border-blue-500 bg-slate-700 text-white flex items-center gap-2";
+                tab2Btn.className = "px-5 py-2.5 font-medium text-sm rounded-t-lg transition border-b-2 border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-700/50 flex items-center gap-2";
+            } else {
+                tab1.classList.add('hidden');
+                tab2.classList.remove('hidden');
+                
+                tab2Btn.className = "px-5 py-2.5 font-medium text-sm rounded-t-lg transition border-b-2 border-blue-500 bg-slate-700 text-white flex items-center gap-2";
+                tab1Btn.className = "px-5 py-2.5 font-medium text-sm rounded-t-lg transition border-b-2 border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-700/50 flex items-center gap-2";
+            }
+        }
+
+        function renderExpenses() {
+            const tbody = document.getElementById('expenseTableBody');
+            tbody.innerHTML = '';
+
+            appState.expenses.forEach((item) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/40 transition";
+                
+                // Category options HTML
+                const catOptions = CATEGORIES.map(cat => 
+                    `<option value="${cat}" ${item.category === cat ? 'selected' : ''}>${cat}</option>`
+                ).join('');
+
+                tr.innerHTML = `
+                    <td class="py-2 px-2 text-center">
+                        <input type="number" min="1" max="31" value="${item.day || ''}" 
+                            onchange="updateExpenseItem(${item.id}, 'day', this.value)"
+                            class="w-12 text-center bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded px-1 py-1 focus:ring-1 focus:ring-blue-500 outline-none">
+                    </td>
+                    <td class="py-2 px-2">
+                        <input type="number" value="${item.amount || ''}" placeholder="0"
+                            oninput="updateExpenseItem(${item.id}, 'amount', this.value)"
+                            class="w-full text-right font-semibold text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded px-2 py-1 focus:ring-1 focus:ring-blue-500 outline-none">
+                    </td>
+                    <td class="py-2 px-2">
+                        <select onchange="updateExpenseItem(${item.id}, 'category', this.value)"
+                            class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded px-1.5 py-1 focus:ring-1 focus:ring-blue-500 outline-none text-xs">
+                            ${catOptions}
+                        </select>
+                    </td>
+                    <td class="py-2 px-2">
+                        <input type="text" value="${item.note || ''}" placeholder="Megjegyzés..."
+                            oninput="updateExpenseItem(${item.id}, 'note', this.value)"
+                            class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded px-2 py-1 focus:ring-1 focus:ring-blue-500 outline-none">
+                    </td>
+                    <td class="py-2 px-1 text-center">
+                        <button onclick="removeExpenseRow(${item.id})" class="text-slate-400 hover:text-red-500 transition px-1 py-1" title="Törlés">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('expenseCountLabel').innerText = `${appState.expenses.length} tétel`;
+        }
+
+        function renderIncomes() {
+            const tbody = document.getElementById('incomeTableBody');
+            tbody.innerHTML = '';
+
+            appState.incomes.forEach((item) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/40 transition";
+                tr.innerHTML = `
+                    <td class="py-2 px-3">
+                        <input type="text" value="${item.name || ''}" placeholder="Név..."
+                            oninput="updateIncomeItem(${item.id}, 'name', this.value)"
+                            class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded px-2 py-1 focus:ring-1 focus:ring-emerald-500 outline-none">
+                    </td>
+                    <td class="py-2 px-3">
+                        <input type="number" value="${item.amount || ''}" placeholder="0"
+                            oninput="updateIncomeItem(${item.id}, 'amount', this.value)"
+                            class="w-full text-right font-semibold text-emerald-600 dark:text-emerald-400 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded px-2 py-1 focus:ring-1 focus:ring-emerald-500 outline-none">
+                    </td>
+                    <td class="py-2 px-1 text-center">
+                        <button onclick="removeIncomeRow(${item.id})" class="text-slate-400 hover:text-red-500 transition px-1 py-1">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('incomeCountLabel').innerText = `${appState.incomes.length} tétel`;
+        }
+
+        function renderFixedExpenses() {
+            const tbody = document.getElementById('fixedExpenseTableBody');
+            tbody.innerHTML = '';
+
+            appState.fixedExpenses.forEach((item) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/40 transition";
+                tr.innerHTML = `
+                    <td class="py-2 px-3">
+                        <input type="text" value="${item.name || ''}" placeholder="Név..."
+                            oninput="updateFixedExpenseItem(${item.id}, 'name', this.value)"
+                            class="w-full bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded px-2 py-1 focus:ring-1 focus:ring-blue-500 outline-none">
+                    </td>
+                    <td class="py-2 px-3">
+                        <input type="number" value="${item.amount || ''}" placeholder="0"
+                            oninput="updateFixedExpenseItem(${item.id}, 'amount', this.value)"
+                            class="w-full text-right font-semibold text-red-600 dark:text-red-400 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded px-2 py-1 focus:ring-1 focus:ring-blue-500 outline-none">
+                    </td>
+                    <td class="py-2 px-1 text-center">
+                        <button onclick="removeFixedExpenseRow(${item.id})" class="text-slate-400 hover:text-red-500 transition px-1 py-1">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('fixedExpenseCountLabel').innerText = `${appState.fixedExpenses.length} tétel`;
+        }
+
+        function addExpenseRow() {
+            const maxId = appState.expenses.reduce((max, item) => Math.max(max, item.id), 0);
+            const today = new Date().getDate();
+            appState.expenses.push({
+                id: maxId + 1,
+                day: today > 30 ? 1 : today,
+                amount: 0,
+                category: CATEGORIES[0],
+                note: ''
+            });
+            renderExpenses();
+            updateCalculations();
+            saveToLocalStorage();
+        }
+
+        function removeExpenseRow(id) {
+            appState.expenses = appState.expenses.filter(i => i.id !== id);
+            renderExpenses();
+            updateCalculations();
+            saveToLocalStorage();
+        }
+
+        function updateExpenseItem(id, field, value) {
+            const item = appState.expenses.find(i => i.id === id);
+            if (item) {
+                if (field === 'amount' || field === 'day') {
+                    item[field] = Number(value);
+                } else {
+                    item[field] = value;
+                }
+                updateCalculations();
+                saveToLocalStorage();
+            }
+        }
+
+        function addIncomeRow() {
+            const maxId = appState.incomes.reduce((max, item) => Math.max(max, item.id), 0);
+            appState.incomes.push({ id: maxId + 1, name: '', amount: 0 });
+            renderIncomes();
+            updateCalculations();
+            saveToLocalStorage();
+        }
+
+        function removeIncomeRow(id) {
+            appState.incomes = appState.incomes.filter(i => i.id !== id);
+            renderIncomes();
+            updateCalculations();
+            saveToLocalStorage();
+        }
+
+        function updateIncomeItem(id, field, value) {
+            const item = appState.incomes.find(i => i.id === id);
+            if (item) {
+                if (field === 'amount') {
+                    item[field] = Number(value);
+                } else {
+                    item[field] = value;
+                }
+                updateCalculations();
+                saveToLocalStorage();
+            }
+        }
+
+        function addFixedExpenseRow() {
+            const maxId = appState.fixedExpenses.reduce((max, item) => Math.max(max, item.id), 0);
+            appState.fixedExpenses.push({ id: maxId + 1, name: '', amount: 0 });
+            renderFixedExpenses();
+            updateCalculations();
+            saveToLocalStorage();
+        }
+
+        function removeFixedExpenseRow(id) {
+            appState.fixedExpenses = appState.fixedExpenses.filter(i => i.id !== id);
+            renderFixedExpenses();
+            updateCalculations();
+            saveToLocalStorage();
+        }
+
+        function updateFixedExpenseItem(id, field, value) {
+            const item = appState.fixedExpenses.find(i => i.id === id);
+            if (item) {
+                if (field === 'amount') {
+                    item[field] = Number(value);
+                } else {
+                    item[field] = value;
+                }
+                updateCalculations();
+                saveToLocalStorage();
+            }
+        }
+
+        function updateCalculations() {
+            // Read inputs
+            const goalInput = document.getElementById('savingsGoalInput');
+            appState.goal = Number(goalInput.value) || 0;
+
+            const schemaInput = document.getElementById('schemaSelect');
+            appState.schema = schemaInput.value;
+
+            const investedInput = document.getElementById('sumInvestedInput');
+            appState.invested = Number(investedInput.value) || 0;
+
+            const debtInput = document.getElementById('sumDebtInput');
+            appState.debt = Number(debtInput.value) || 0;
+
+            // 1. Totals
+            const totalIncome = appState.incomes.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+            const totalFixedCost = appState.fixedExpenses.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+            const totalExpenses = appState.expenses.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+
+            // Footers
+            document.getElementById('expenseTotalFooter').innerText = formatFt(totalExpenses);
+            document.getElementById('incomeTotalFooter').innerText = formatFt(totalIncome);
+            document.getElementById('fixedExpenseTotalFooter').innerText = formatFt(totalFixedCost);
+
+            // 2. Hó eleji összegzés
+            const disposableAmount = totalIncome - totalFixedCost;
+            const dailyTarget = (disposableAmount - appState.goal) > 0 ? (disposableAmount - appState.goal) / DAYS_IN_MONTH : 0;
+            const dailyZero = disposableAmount > 0 ? disposableAmount / DAYS_IN_MONTH : 0;
+
+            document.getElementById('sumTotalIncome').innerText = formatFt(totalIncome);
+            document.getElementById('sumTotalFixedCost').innerText = formatFt(totalFixedCost);
+            document.getElementById('sumDisposableAmount').innerText = formatFt(disposableAmount);
+            document.getElementById('sumDailyTarget').innerText = formatFt(dailyTarget);
+            document.getElementById('sumDailyZero').innerText = formatFt(dailyZero);
+
+            // 3. Összefoglaló Panel
+            const currentDay = new Date().getDate();
+            const daysInMonth = 30; // standard month reference
+            const remainingDays = Math.max(1, daysInMonth - currentDay + 1);
+
+            const spendableToday = (disposableAmount - totalExpenses - appState.goal) / remainingDays;
+            const currentSavings = disposableAmount - totalExpenses;
+            const projectedSavings = currentSavings; // based on current status
+            const totalWealth = (currentSavings + appState.invested) - appState.debt;
+
+            document.getElementById('sumTotalExpenses').innerText = formatFt(totalExpenses);
+            document.getElementById('sumSpendableToday').innerText = formatFt(spendableToday > 0 ? spendableToday : 0);
+            document.getElementById('sumCurrentSavings').innerText = formatFt(currentSavings);
+            document.getElementById('sumProjectedSavings').innerText = formatFt(projectedSavings);
+            document.getElementById('sumTotalWealth').innerText = formatFt(totalWealth);
+
+            // 4. Kategória szerinti bontás
+            updateCategoryBreakdown(totalExpenses);
+        }
+
+        function updateCategoryBreakdown(totalExpenses) {
+            const container = document.getElementById('categoryBreakdownContainer');
+            container.innerHTML = '';
+
+            // Map expense totals per category
+            const categorySums = {};
+            CATEGORIES.forEach(cat => categorySums[cat] = 0);
+
+            appState.expenses.forEach(item => {
+                const cat = item.category || 'Egyéb';
+                categorySums[cat] = (categorySums[cat] || 0) + (Number(item.amount) || 0);
+            });
+
+            CATEGORIES.forEach(cat => {
+                const sum = categorySums[cat] || 0;
+                const percentage = totalExpenses > 0 ? Math.round((sum / totalExpenses) * 100) : 0;
+
+                const div = document.createElement('div');
+                div.className = "flex flex-col space-y-1 py-1 border-b border-slate-100 dark:border-slate-700/40 last:border-0";
+                div.innerHTML = `
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-slate-700 dark:text-slate-300 font-medium">${cat}</span>
+                        <span class="font-bold text-slate-800 dark:text-slate-100">${formatFt(sum)}</span>
+                    </div>
+                    <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 overflow-hidden">
+                        <div class="bg-blue-600 h-1.5 rounded-full transition-all duration-300" style="width: ${percentage}%"></div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function saveToLocalStorage() {
+            try {
+                localStorage.setItem('hungarian_finance_data', JSON.stringify(appState));
+            } catch (e) {
+                console.error("LocalStorage error", e);
+            }
+        }
+
+        function loadFromLocalStorage() {
+            try {
+                const data = localStorage.getItem('hungarian_finance_data');
+                if (data) {
+                    appState = JSON.parse(data);
+                    document.getElementById('savingsGoalInput').value = appState.goal || 50000;
+                    document.getElementById('schemaSelect').value = appState.schema || 'terv';
+                    document.getElementById('sumInvestedInput').value = appState.invested || 0;
+                    document.getElementById('sumDebtInput').value = appState.debt || 0;
+                }
+            } catch (e) {
+                console.error("LocalStorage load error", e);
+            }
+        }
+
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `penzugyek_export_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            showToast("Sikeres adatexportálás!");
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (parsed && typeof parsed === 'object') {
+                        appState = parsed;
+                        document.getElementById('savingsGoalInput').value = appState.goal || 50000;
+                        document.getElementById('schemaSelect').value = appState.schema || 'terv';
+                        document.getElementById('sumInvestedInput').value = appState.invested || 0;
+                        document.getElementById('sumDebtInput').value = appState.debt || 0;
+
+                        renderExpenses();
+                        renderIncomes();
+                        renderFixedExpenses();
+                        updateCalculations();
+                        saveToLocalStorage();
+                        showToast("Sikeres adatimportálás!");
+                    }
+                } catch (err) {
+                    showToast("Érvénytelen fájl formátum!", true);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function resetData() {
+            appState = {
+                expenses: [],
+                incomes: [],
+                fixedExpenses: [],
+                goal: 0,
+                schema: 'terv',
+                invested: 0,
+                debt: 0
+            };
+            document.getElementById('savingsGoalInput').value = 0;
+            document.getElementById('sumInvestedInput').value = 0;
+            document.getElementById('sumDebtInput').value = 0;
+
+            renderExpenses();
+            renderIncomes();
+            renderFixedExpenses();
+            updateCalculations();
+            saveToLocalStorage();
+            showToast("Minden adat törölve lett.");
+        }
+
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            localStorage.setItem('finance_theme', isDark ? 'dark' : 'light');
+        }
+
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            const toastIcon = document.getElementById('toastIcon');
+
+            toastMsg.innerText = msg;
+            if (isError) {
+                toastIcon.className = "fa-solid fa-circle-exclamation text-red-400";
+            } else {
+                toastIcon.className = "fa-solid fa-circle-check text-emerald-400";
+            }
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // Initialize application on startup
+        window.onload = function() {
+            // Apply saved dark theme preference
+            if (localStorage.getItem('finance_theme') === 'dark' || 
+               (!('finance_theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            }
+
+            loadFromLocalStorage();
+            renderExpenses();
+            renderIncomes();
+            renderFixedExpenses();
+            updateCalculations();
+        };
+    </script>
+</body>
+</html>
