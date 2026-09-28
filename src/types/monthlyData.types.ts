@@ -1,4 +1,6 @@
 export interface MonthlyData {
+    year: number,
+    month: number,
     costs: Cost[],
     target: Target,
     fixCosts: Prerequisite[],
