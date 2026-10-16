@@ -1,8 +1,13 @@
 import { Module } from '@nestjs/common';
-import { HealthController } from './controller/health.controller';
-import { HealthService } from './service/health.service';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { HealthController } from './controller/health.controller';
+import { HtmlRedirectController } from './controller/htmlRedirect.controller';
+import { MonthlyDataController } from './controller/monthlyData.controller';
+import { HealthService } from './service/health.service';
+import { HtmlRedirectService } from './service/htmlRedirect.service';
+import { MonthlyDataService } from './service/monthlyData.service';
+import { DateUtil } from './utilities/date.util';
 
 @Module({
   imports: [
@@ -17,7 +22,7 @@ import { join } from 'path';
       },
     ),
   ],
-  controllers: [HealthController],
-  providers: [HealthService],
+  controllers: [HealthController, HtmlRedirectController, MonthlyDataController],
+  providers: [HealthService, HtmlRedirectService, MonthlyDataService, DateUtil],
 })
-export class AppModule {}
+export class AppModule { }

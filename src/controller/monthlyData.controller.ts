@@ -7,7 +7,11 @@ export class MonthlyDataController {
     constructor(private readonly monthlyDataService: MonthlyDataService) { }
 
     @Get(':year/:month')
-    async getMonthlyData(@Param('year') year: number, @Param('month') month: number): MonthlyData {
+    async getMonthlyData(@Param('year') year: number, @Param('month') month: number): Promise<MonthlyData | undefined> {
         return this.monthlyDataService.getMonthlyData(year, month);
+    }
+
+    getHtml() {
+        
     }
 }

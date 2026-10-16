@@ -1,0 +1,3 @@
+- Jobbra balra gombok
+- Hónap neve kalkulált legyen
+- Dummy adatok helyett bevezetni hogy megnyitáskor lekérdezzen
