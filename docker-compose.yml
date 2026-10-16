@@ -37,6 +37,7 @@ services:
       PORT: 3000
       MONGO_URI: mongodb://admin:password@mongodb:27017/financial_logger?authSource=admin
       NODE_ENV: dev
+      JWT_SECRET: Cant-tell-you-sorry
     depends_on:
       - financial-logger-mongodb
 
